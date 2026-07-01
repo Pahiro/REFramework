@@ -1594,8 +1594,9 @@ void IntegrityCheckBypass::immediate_patch_re9() {
                 cond_nop_size = ctx.instrux.Length;
             }
 
-            // After finding a SETcc, look for the dispatch table access: MOV with [base + index*8]
-            if (cond_addr.has_value() && ctx.instrux.Instruction == ND_INS_MOV) {
+            // After finding a SETcc, look for the dispatch table access: MOV or LEA with [base + index*8]
+            // RE9 post-June-25-2026 update changed from MOV to LEA for the dispatch table access.
+            if (cond_addr.has_value() && (ctx.instrux.Instruction == ND_INS_MOV || ctx.instrux.Instruction == ND_INS_LEA)) {
                 for (uint8_t i = 0; i < ctx.instrux.OperandsCount; i++) {
                     const auto& op = ctx.instrux.Operands[i];
                     if (op.Type == ND_OP_MEM && op.Info.Memory.HasIndex && op.Info.Memory.HasBase && op.Info.Memory.Scale == 8) {
